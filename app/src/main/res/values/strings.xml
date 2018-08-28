@@ -1,0 +1,136 @@
+<resources>
+    <string name="app_name">ProtoTypeApp</string>
+    <string name="title_activity_welcome">Home Screen</string>
+    <string name="next">NEXT</string>
+    <string name="skip">SKIP</string>
+    <string name="start">GOT IT</string>
+
+    <string name="slide_1_title">Discuss Customization</string>
+    <string name="slide_1_desc">Lets discuss your Cad Customization issues here !</string>
+
+    <string name="slide_2_title">Get Suggestions</string>
+    <string name="slide_2_desc">Ask Suggestions from your colleagues and friends!</string>
+
+    <string name="slide_3_title">Connect with Everyone </string>
+    <string name="slide_3_desc">Anyone can share ideas here!</string>
+
+    <string name="slide_4_title">Teach New comers</string>
+    <string name="slide_4_desc">Encourage engineers to learn technologies!</string>
+
+    <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome slider -> clear data</string>
+    <string name="play_again">Play Again</string>
+
+    <string name="initStr">this is a init sentence</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+
+    <string name="action_sign_in_short">Register</string>
+    <string name="email">Email</string>
+    <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
+    <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
+    <string name="change_email">Change Email</string>
+    <string name="change_password">Change Password</string>
+    <string name="send_password_reset_email">Send Password reset email</string>
+    <string name="remove_user">Remove user</string>
+    <string name="new_pass">New Password</string>
+    <string name="title_activity_profile">Firebase</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_name">Fullname</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="btn_link_to_register">Not a member? Get registered in Firebase now!</string>
+    <string name="btn_link_to_login">Already registered. Login Me!</string>
+    <string name="title_activity_reset_password">ResetPasswordActivity</string>
+    <string name="btn_forgot_password">Forgot your password?</string>
+    <string name="btn_reset_password">Reset Password</string>
+    <string name="btn_back"><![CDATA[<< Back]]></string>
+    <string name="hint_new_email">New Email</string>
+    <string name="btn_change">Change</string>
+    <string name="btn_send">Send</string>
+    <string name="btn_remove">Remove</string>
+    <string name="btn_sign_out">Sign Out</string>
+    <string name="lbl_forgot_password">Forgot password?</string>
+    <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
+
+
+    <string name="btn_restore">Restore Password</string>
+    <string name="btn_register">Register</string>
+    <string name="hint_et_email">Email</string>
+    <string name="hint_et_pass">Password</string>
+    <string name="checkbox_remember">Remember me</string>
+
+    <string name="tv_restore">Forgot password?</string>
+    <string name="btn_facebook">Facebook Login</string>
+    <string name="btn_google">Google Login</string>
+    <string name="tv_register">No account yet? Create one</string>
+    <string name="hint_et_name">Name</string>
+    <string name="label_register_activity">Registration</string>
+    <string name="label_restore_activity">Restore Password</string>
+
+    <string name="fb_login_success">Login with Facebook successful!</string>
+    <string name="login_fail">Login failed</string>
+    <string name="google_login_success">Login with Google successful!</string>
+    <string name="email_login_success">Login successful!</string>
+    <string name="register_success">Registration done!</string>
+    <string name="register_fail">Registration failed</string>
+    <string name="error_email">Enter a valid email</string>
+    <string name="error_pass">Enter a password</string>
+    <string name="restore_email_sent">Please check your email for an account restoration link.</string>
+    <string name="restore_email_fail">Restore email was not sent</string>
+    <string name="text_item">Message</string>
+
+    <string-array name="Topics">
+        <item>Introduction</item>
+        <item>Types</item>
+        <item>SampleCode</item>
+        <item>HelpDocs</item>
+        <item>Videos</item>
+    </string-array>
+    <string name="title_activity_bottom_navigation">BottomNavigation</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="action_settings">Settings</string>
+    <string-array name="Customization_Types">
+        <item>READING</item>
+        <item>WRITING</item>
+        <item>SINGING</item>
+        <item>LISTENING TO MUSIC</item>
+        <item>DANCING</item>
+        <item>PROGRAMMING</item>
+        <item>PLAYING FOOTBALL</item>
+        <item>SWIMMING</item>
+        <item>READING</item>
+        <item>WRITING</item>
+        <item>SINGING</item>
+        <item>LISTENING TO MUSIC</item>
+        <item>DANCING</item>
+        <item>WRITING</item>
+        <item>SINGING</item>
+        <item>LISTENING TO MUSIC</item>
+        <item>DANCING</item>
+        <item>PROGRAMMING</item>
+        <item>PLAYING FOOTBALL</item>
+        <item>SWIMMING</item>
+        <item>READING</item>
+        <item>WRITING</item>
+        <item>SINGING</item>
+        <item>LISTENING TO MUSIC</item>
+        <item>DANCING</item>
+    </string-array>
+</resources>

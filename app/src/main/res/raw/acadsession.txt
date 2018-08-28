@@ -1,0 +1,744 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Autodesk.AutoCAD.Interop.Common;
+using Autodesk.AutoCAD.Interop;
+using System.Runtime.InteropServices;
+
+
+namespace QuestAutomation
+{
+    public class AutoCADSession
+    {
+
+        private static AutoCADSession autoCADSessionObj = null;
+        private AcadApplication acadApp = null;
+        public AcadDocument activedoc = null;
+        private string acadConnectionString = null;
+        AcadEntity acadEntity = null;
+        AcadLeader acadLeader = null;
+
+
+
+        private AutoCADSession(string acadConnectionString)
+        {
+            this.acadConnectionString = acadConnectionString;
+          
+
+            init(this.acadConnectionString);
+        }
+
+        /// <exception cref="InvalidOperationException"> Throws Exception when AutoCAD Instance is not found</exception>
+        public static AutoCADSession getAutoCADSession(string acadConnectionString)
+        {
+            if (autoCADSessionObj == null)
+            {
+                autoCADSessionObj = new AutoCADSession(acadConnectionString);
+
+            }
+            return autoCADSessionObj;
+        }
+
+
+
+        private void init(string acadConnectionString)
+        {
+            try
+            {
+                acadApp = (AcadApplication)Marshal.GetActiveObject(acadConnectionString);
+
+                acadApp.Visible = true;
+
+            }
+            catch
+            {
+                // Create a new instance of AutoCAD
+                acadApp = (AcadApplication)Activator.CreateInstance(Type.GetTypeFromProgID(acadConnectionString), true);
+
+                acadApp.Visible = true;
+            }
+
+
+        }
+        /// <exception cref="Exception"> Throws Exception when operation fails</exception>
+        public void open(String filePath)
+        {
+            acadApp.Documents.Open(filePath, false, null);
+
+            activedoc = acadApp.ActiveDocument;
+
+
+        }
+
+        public void createLayer(string layerName)
+        {
+
+            AcadLayer acadLayer = activedoc.Layers.Add(layerName);
+
+            activedoc.ActiveLayer = acadLayer;
+
+
+        }
+
+        public AcadSelectionSet createSelectionSetForType(String enityType, String dxfCode, String selectionSetName)
+        {
+                AcadSelectionSet acadSelectionset = activedoc.SelectionSets.Add(selectionSetName);
+
+                object selection = Type.Missing;
+
+                short[] dxfcode = new short[] { Convert.ToInt16(dxfCode) };
+
+                object[] dxfvalue = new object[] { enityType };
+
+                acadSelectionset.Select(AcSelect.acSelectionSetAll, selection, selection, dxfcode as object, dxfvalue as object);
+
+                return acadSelectionset;      
+          
+
+        }
+    
+        public AcadLayer getLayer(string layerName)
+        {
+            AcadLayer acadLayer = null;
+
+            for (int i = 0; i < activedoc.Layers.Count; i++)
+            {
+                acadLayer = activedoc.Layers.Item(i);
+
+                if (acadLayer.Name.Equals(layerName))
+                {
+                    break;
+                }              
+
+                
+            }
+
+            return acadLayer;
+        }
+
+
+        public void moveSelectionToLayer(String layerName, AcadSelectionSet acadSelectionSet)
+        {
+
+            //Change the layer information for entities in the selection set accordingly
+            for (int j = 0; j < acadSelectionSet.Count; j++)
+            {
+                acadSelectionSet.Item(j).Layer = layerName;
+
+                if (layerName.Equals("5_LAYER"))
+                {
+                    acadEntity = acadSelectionSet.Item(j);
+
+                    if (acadEntity is AcadCircle)
+                    {
+                        AcadCircle acadCircle = (AcadCircle)acadEntity;
+
+                        double[] Centerp = (double[])acadCircle.Center;
+
+                        double[] newcen = new double[3];
+
+                        newcen[0] = Centerp[0];
+
+                        newcen[1] = Centerp[1];
+
+                        newcen[2] = Centerp[2];
+
+                        double rad = (double)acadCircle.Radius;
+
+                        double newrad = new double();                       
+
+                        newrad = rad *1.5;
+
+                        acadCircle.Erase();
+
+                        acadCircle = activedoc.ModelSpace.AddCircle(newcen, newrad);
+                    }
+                    else if (acadEntity is AcadLine)
+                    {
+                        try
+                        {
+
+                        AcadLine acadLine = (AcadLine)acadEntity;
+
+                        double angle = (double)acadLine.Angle;
+
+                        double[] endPoint = (double[])acadLine.EndPoint;
+
+                        double[] startPoint = (double[])acadLine.StartPoint;
+
+                        double[] extendPoint = new double[3];
+
+                        extendPoint[0] = endPoint[0];
+
+                        extendPoint[1] = endPoint[1];
+
+                        extendPoint[2] = endPoint[2];
+
+                        double[] points = new double[9];
+                        points[0] = startPoint[0];
+                        points[1] = startPoint[1];
+                        points[2] = startPoint[2];
+                        points[3] = endPoint[0];
+                        points[4] = endPoint[1];
+                        points[5] = endPoint[2];
+                        points[6] = extendPoint[0];
+                        points[7] = extendPoint[1];
+                        points[8] = extendPoint[2];
+
+                       
+
+                            if (points[0] == points[3])
+                            {
+                                points[6] = extendPoint[0] + 0.00001;
+                                acadLeader = activedoc.ModelSpace.AddLeader(points, null, AcLeaderType.acLineWithArrow);
+                            }
+                            else if (points[1] == points[4])
+                            {
+                                points[7] = extendPoint[1] + 0.00001;
+                                acadLeader = activedoc.ModelSpace.AddLeader(points, null, AcLeaderType.acLineWithArrow);
+                            }
+
+                            else if (points[0] > points[3])
+                            {
+                                points[6] = extendPoint[0] - 10.0;
+                                acadLeader = activedoc.ModelSpace.AddLeader(points, null, AcLeaderType.acLineWithArrow);
+                            }
+                            else if (points[0] < points[3])
+                            {
+                                points[6] = extendPoint[0] + 10.0;
+
+                                acadLeader = activedoc.ModelSpace.AddLeader(points, null, AcLeaderType.acLineWithArrow);
+                            }
+                        
+                    }
+                        catch (Exception ex1)
+                        {
+                            throw ex1;
+                        }
+                    }
+                    else if (acadEntity is AcadSolid)
+                    {
+                        AcadSolid acadSolid = (AcadSolid)acadEntity;
+
+                        acadSolid.Erase();
+                    }
+                   
+                        
+
+                }
+
+                //else if (layerName.Equals("text_LAYER"))
+                //{
+                //    acadEntity = acadSelectionSet.Item(j);
+
+                //    if (acadEntity is AcadText)
+                //    {
+                //        AcadText acadTextLayer = (AcadText)acadEntity;
+
+                //        if (acadTextLayer.TextString.Length.Equals(2))
+                //        {
+                //            acadTextLayer.Visible = false;
+                //        }
+
+                //        //double[] textOrigin = (double[])acadTextLayer.InsertionPoint;
+
+                //        //double[] moveTextOrigin = new double[3];
+
+                //        //moveTextOrigin[0] = 10.0;
+                //        //moveTextOrigin[1] = 200.0;
+                //        //moveTextOrigin[2] = 0.0;
+                //        //acadTextLayer.Move(textOrigin, moveTextOrigin);
+
+                //        //acadTextLayer.Update();
+
+
+                //    }
+
+                //}
+            }
+            }
+
+            
+
+
+        
+        public AcadDimStyle createDimensionStyle(String styleName)
+        {
+            AcadDimStyle acadDimStyle = activedoc.DimStyles.Add(styleName);
+
+            activedoc.ActiveDimStyle = acadDimStyle;
+
+            return acadDimStyle;
+
+        }
+
+
+        public void setPropertyToDimensionStyle(String dimensionStyleName)
+        {
+            AcadDimStyle acadDimStyle = createDimensionStyle(dimensionStyleName);
+           
+                //Assign system variables to new dimension style
+                //This helps the user to set the properties of DimensionStyle
+
+                activedoc.SetVariable("DIMSAH", 1);
+
+                activedoc.SetVariable("DIMLDRBLK", "");
+
+                activedoc.SetVariable("DIMBLK1", "");
+
+                activedoc.SetVariable("DIMBLK2", "");
+
+                activedoc.SetVariable("DIMTXT", 3.5);
+
+                activedoc.SetVariable("DIMDEC", 1);
+
+                activedoc.SetVariable("DIMCLRD", 7);
+
+                activedoc.SetVariable("DIMZIN", 8);
+
+                activedoc.SetVariable("DIMDSEP", ",");
+
+                activedoc.SetVariable("DIMTFAC", 3.5);
+
+                activedoc.SetVariable("DIMTIH", 1);
+
+                activedoc.SetVariable("DIMTOH", 0);
+
+                activedoc.SetVariable("DIMTMOVE", 1);
+
+                activedoc.SetVariable("DIMTAD", 1);
+
+                activedoc.SetVariable("DIMASZ", 3);
+
+                activedoc.ActiveDimStyle.CopyFrom(this.activedoc);
+
+                activedoc.SendCommand("dim update all  exit "); 
+            
+
+        }
+
+        public AcadLayout createLayout(int lay, string name)
+        {         
+            AcadLayout acadlayout = null;
+
+            acadlayout = activedoc.ActiveLayout;            
+                           
+            acadlayout = activedoc.Layouts.Add(name + lay.ToString());
+
+            activedoc.ActiveLayout = acadlayout;           
+          
+            return acadlayout;
+            
+        }
+
+
+        public AcadViewport createViewPort(int v, string name)
+        {
+            AcadViewport acadViewport = null;  
+
+            activedoc.SetVariable("TILEMODE", 1);           
+
+            acadViewport = activedoc.Viewports.Add(name + v.ToString());
+
+            activedoc.ActiveViewport = acadViewport;
+
+            return acadViewport;
+
+
+        }
+
+        public void createPaperView(int ent, AcadBlockReference acadBlockReference)
+        {
+
+            string blockRef = "Mach3_";
+
+            AcadLayout acadLayout = createLayout(ent, blockRef);
+
+            object min = new object[3];
+
+            object max = new object[3];
+
+            acadBlockReference.GetBoundingBox(out min, out max);
+
+            acadApp.ZoomWindow(min, max);
+
+            AcadViewport acadViewport = createViewPort(ent, blockRef);
+
+            double[] origin = (double[])acadBlockReference.InsertionPoint;
+
+            double x = (double)acadBlockReference.XScaleFactor;
+
+            double y = (double)acadBlockReference.YScaleFactor;
+
+            double z = (double)acadBlockReference.ZScaleFactor;
+
+            double r = (double)acadBlockReference.Rotation;         
+
+            acadApp.ZoomWindow(min, max);
+
+            double[] p1 = (double[])min;
+            double[] p2 = (double[])max;
+            double value1 = p1[0];
+            double value2 = p2[0];         
+           
+
+            double[] cen = new double[2];
+
+            cen[0] = (double)(p1[0] + p2[0]) / 2;
+
+            cen[1] = (double)(p1[1] + p2[1]) / 2;
+
+
+            double[] viewcen = new double[3];
+
+            viewcen[0] = (double)((p1[0] + p2[0]) / 2);
+
+            viewcen[1] = (double)((p1[1] + p2[1]) / 2);
+
+            viewcen[2] = 0.0;
+
+            acadViewport.Center = cen;
+
+            acadViewport.Width = p2[0] - p1[0];
+
+            acadViewport.Height = p2[1] - p1[1];
+
+            activedoc.SetVariable("TILEMODE", 0);
+
+            AcadPViewport acadPviewPort = activedoc.ActivePViewport;
+
+            acadPviewPort.Width =Convert.ToDouble( p2[0] - p1[0]);
+
+            acadPviewPort.Height = Convert.ToDouble(p2[1] - p1[1]);
+
+            acadPviewPort = activedoc.PaperSpace.AddPViewport(viewcen, acadPviewPort.Width, acadPviewPort.Height);
+
+            acadPviewPort.Display(true);
+            activedoc.SetVariable("TILEMODE", 1);
+            acadApp.ZoomAll();     
+           
+        }
+
+
+        public void lowerToUpperCase(int entityCount, string name, string[] act, string[] replac, string templatePath)
+        {
+
+            AcadBlockReference acadBlockReference = null;
+
+            AcadBlockReference acadBlockReference1 = null;
+
+            AcadAttributeReference acadAttributeReference = null;
+
+            AcadAttributeReference acadAttributReference1 = null;
+            AcadAttributeReference acadAttributReference2 = null;
+            AcadAttributeReference acadAttributReference3 = null;
+            AcadBlockReference acadBlockReference2 = null;
+            AcadBlockReference acadBlockReference3 = null;
+
+            int a = 0;
+
+            int a11 = 0;
+
+            int b11 = 0;
+
+            //Collecting Text entities from Model Space
+            for (int i = 0; i < entityCount; i++)
+            {
+                acadEntity = activedoc.ModelSpace.Item(i);
+
+                if (acadEntity is AcadText)
+                {
+
+                    AcadText acadText = (AcadText)acadEntity;
+
+                    string upperCase = acadText.TextString.ToUpper();
+
+                    acadText.Height = 3.5;
+
+                    acadText.TextString = upperCase;
+
+                    if (acadText.TextString.Length.Equals(3))
+                    {
+                        string sectionViewName = acadText.TextString;
+
+                        char[] splitToArray = sectionViewName.ToCharArray();
+
+                        if (splitToArray[0] == splitToArray[2])
+                        {
+                            acadText.Height = 6.0;
+                            AcadAcCmColor sectionViewTextColor = acadText.TrueColor;
+                            sectionViewTextColor.ColorIndex = AcColor.acMagenta;
+                            acadText.TrueColor = sectionViewTextColor;
+                            acadText.Update();
+                        }
+
+
+
+                    }
+
+
+                }
+                else if (acadEntity is AcadBlockReference)
+                {
+
+
+                    acadBlockReference = (AcadBlockReference)acadEntity;
+
+
+                    string blockReferenceName = acadBlockReference.Name;
+
+                    if (blockReferenceName.StartsWith("RAHMEN") | blockReferenceName.StartsWith("GEN_A4") | blockReferenceName.StartsWith("GEN_A0"))
+                    {
+                        a++;
+
+                        acadBlockReference.Visible = false;
+
+                        autoCADSessionObj.createPaperView(a, acadBlockReference);
+                    }
+
+
+                        else if (blockReferenceName.StartsWith("SCHRFELD") | blockReferenceName.StartsWith("GENTITLE"))
+                        
+                    {                       
+                            
+                            acadBlockReference.Visible = false;
+
+                            double[] origin = (double[])acadBlockReference.InsertionPoint;
+                            double x = (double)acadBlockReference.XScaleFactor;
+                            double y = (double)acadBlockReference.YScaleFactor;
+                            double z = (double)acadBlockReference.ZScaleFactor;
+                            double r = (double)acadBlockReference.Rotation;
+
+                            string xval = x.ToString();
+
+                            double[] neworigin = new double[3];
+                            neworigin[0] = origin[0] - origin[0];
+                            neworigin[1] = origin[1];
+                            neworigin[2] = origin[2];
+
+                            object[] attributes = (object[])acadBlockReference.GetAttributes();
+                            for (int k = 0; k < attributes.Length; k++)
+                            {
+                                acadAttributeReference = (AcadAttributeReference)attributes[k];
+
+                                if (acadAttributeReference.TagString.Equals("BEZ"))
+                                {
+
+                                    string m = acadAttributeReference.TextString;
+
+                                    for (a11 = 1; a11 < act.Length; a11++)
+                                    {
+                                        if (act[a11].ToString().Trim() == m.Trim())
+                                        {
+                                            acadAttributeReference.TextString = replac[a11];
+                                            acadAttributeReference.Update();
+                                            break;
+
+                                        }
+
+                                    }
+                                }
+                                else if (acadAttributeReference.TagString.Equals("ZNR") || acadAttributeReference.TagString.Equals("GEN-TITLE-NR{13.37}"))
+                                {
+                                    string[] splitString = acadAttributeReference.TextString.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+
+                                    if (splitString[4].Equals("0"))
+                                    {
+                                        if (a == 1)
+                                        {
+                                            neworigin[1] = origin[1] - 5.0;
+
+                                            acadBlockReference = activedoc.PaperSpace.InsertBlock(neworigin,templatePath + "\\Templates\\A0PAPER_update.DWG", x, y, z, r, null);
+                                            
+                                        }
+                                        else if (a>1)
+                                        {
+                                            neworigin[0] = origin[0] - 1184.0;
+                                            neworigin[1] = origin[1] - 5.0;
+                                            acadBlockReference = activedoc.PaperSpace.InsertBlock(neworigin, templatePath + "\\Templates\\A0PAPER2.DWG", x, y, z, r, null);
+                                        }
+                                    }
+                                    else if (splitString[4].Equals("1"))
+                                    {
+                                        //if (xval.Equals("1"))
+                                        //{
+                                            neworigin[1] = origin[1] - 5.0;
+
+                                            acadBlockReference1 = activedoc.PaperSpace.InsertBlock(neworigin, templatePath + "\\Templates\\A1PAPER_update.DWG", x, y, z, r, null);
+                                           
+                                            object[] attributes1 = (object[])acadBlockReference1.GetAttributes();
+
+                                            for (int k1 = 0; k1 < attributes1.Length; k1++)
+                                            {
+                                                acadAttributReference1 = (AcadAttributeReference)attributes1[k1];
+                                                if (acadAttributReference1.TagString.Equals("PART_NUMBER"))
+                                                {
+                                                    string m1 = acadAttributReference1.TextString;
+                                                    acadAttributReference1.TextString = acadAttributeReference.TextString;
+                                                    acadAttributReference1.Update();
+                                                  
+
+                                                }
+                                                else if (acadAttributReference1.TagString.Equals("PART_NAME"))
+                                                {
+                                                    string name1 = acadAttributReference1.TextString;
+                                                    acadAttributReference1.TextString = acadAttributeReference.TextString;
+                                                    acadAttributReference1.Update();                                                 
+
+                                                }
+                                            }
+
+                                            
+
+                                        //}
+                                        //else if (xval.Equals("0.5"))
+                                        //{
+                                        //    neworigin[1] = origin[1] - 2.5;
+
+                                        //    acadBlockReference = activedoc.PaperSpace.InsertBlock(neworigin, templatePath + "\\Templates\\A1PAPER_update.DWG", x, y, z, r, null);
+
+                                        //}
+                                    }
+                                    else if (splitString[4].Equals("2"))
+                                    {
+                                        acadBlockReference2 = activedoc.PaperSpace.InsertBlock(neworigin, templatePath + "\\Templates\\A2PAPER_update.DWG", x, y, z, r, null);
+                                        object[] attributes2 = (object[])acadBlockReference2.GetAttributes();
+
+                                        for (int k2 = 0; k2 < attributes2.Length; k2++)
+                                        {
+                                            acadAttributReference2 = (AcadAttributeReference)attributes2[k2];
+                                            if (acadAttributReference2.TagString.Equals("PART_NUMBER"))
+                                            {
+                                                string m2 = acadAttributReference2.TextString;
+                                                acadAttributReference2.TextString = acadAttributeReference.TextString;
+                                                acadAttributReference2.Update();
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else if (splitString[4].Equals("3") || splitString[4].Equals("4"))
+                                    {
+                                        neworigin[1] = origin[1] - 5.0;
+
+                                        acadBlockReference3 = activedoc.PaperSpace.InsertBlock(neworigin, templatePath + "\\Templates\\A3PAPER_update.DWG", x, y, z, r, null);
+                                        object[] attributes3 = (object[])acadBlockReference3.GetAttributes();
+
+                                        for (int k3 = 0; k3 < attributes3.Length; k3++)
+                                        {
+                                            acadAttributReference3 = (AcadAttributeReference)attributes3[k3];
+                                            if (acadAttributReference3.TagString.Equals("PART_NUMBER"))
+                                            {
+                                                string m3 = acadAttributReference3.TextString;
+                                                acadAttributReference3.TextString = acadAttributeReference.TextString;
+                                                acadAttributReference3.Update();
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                }                          
+
+                        }
+                    }
+                    else if (blockReferenceName.Equals("MM_STL"))
+                    {
+                        acadBlockReference.Visible = false;
+
+                        double[] blockInsertionPoint = (double[])acadBlockReference.InsertionPoint;
+
+                        object[] attributes = (object[])acadBlockReference.GetAttributes();
+
+                        for (int l = 0; l < attributes.Length; l++)
+                        {
+                            acadAttributeReference = (AcadAttributeReference)attributes[l];
+
+
+                            if (acadAttributeReference.TagString.Equals("CCCMMPOS_POS"))
+                            {
+                                string balloonName = acadAttributeReference.TextString;
+
+                                for (b11 = 1; b11 < act.Length; b11++)
+                                {
+                                    if (act[b11].ToString().Trim() == balloonName.Trim())
+                                    {
+                                        acadAttributeReference.TextString = replac[b11];
+                                        AcadText acadAttributeText = activedoc.ModelSpace.AddText(acadAttributeReference.TextString, blockInsertionPoint, 3.5);
+                                        acadAttributeText.Visible = true;
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+
+
+                    }
+
+
+                }
+
+
+            }
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+        public void setPropertyToLayer(String layerName, String propertyName, String propertyValue)
+        {
+            try
+            {
+
+                //Get the relevant layer
+                AcadLayer acadLayer = getLayer(layerName);
+
+                if (propertyName.Equals("color"))
+                {
+                    AcadAcCmColor layerColor = acadLayer.TrueColor;
+                    layerColor.ColorIndex = (AcColor)Convert.ToInt32(propertyValue);
+                    acadLayer.TrueColor = layerColor;
+
+                }
+
+                else if (propertyName.Equals("linetype"))
+                {
+                    AcadLineTypes linetypes = activedoc.Linetypes;
+                    linetypes.Load(propertyValue, "acad.lin");
+                    acadLayer.Linetype = propertyValue;
+
+                }
+
+
+
+            }
+            catch (Exception ex1)
+            {
+                ex1.Message.ToString();
+            }
+        }
+        
+        
+
+        public void closeSession()
+        {
+            acadApp.Quit();
+        }
+
+    }
+
+
+}
+
+
