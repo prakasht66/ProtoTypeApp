@@ -16,8 +16,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    productFlavors {
-    }
+
 }
 
 dependencies {
@@ -34,24 +33,22 @@ dependencies {
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    implementation 'com.google.android.gms:play-services-auth:15.0.0'
-    implementation 'com.google.firebase:firebase-messaging:15.0.2'
-    implementation 'com.google.firebase:firebase-firestore:15.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.google.android.gms:play-services-auth:16.0.0'
+    implementation 'com.google.firebase:firebase-messaging:17.3.1'
+    implementation 'com.google.firebase:firebase-firestore:17.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'id.zelory:compressor:2.1.0'
-    implementation 'com.google.firebase:firebase-database:15.0.0'
-    implementation 'com.google.firebase:firebase-crash:15.0.2'
-    implementation 'com.google.firebase:firebase-auth:15.0.0'
-    implementation 'com.google.firebase:firebase-storage:15.0.0'
-    implementation 'com.google.firebase:firebase-core:15.0.2'
+    implementation 'com.google.firebase:firebase-database:16.0.2'
+    implementation 'com.google.firebase:firebase-crash:16.2.0'
+    implementation 'com.google.firebase:firebase-auth:16.0.3'
+    implementation 'com.google.firebase:firebase-storage:16.0.2'
+    implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'com.firebaseui:firebase-ui-database:3.2.2'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.6.+'
-    //implementation 'com.squareup.picasso:picasso:2.5.2'
-    implementation files('libs/itsrts-pptviewer.jar')
-    implementation 'com.github.bumptech.glide:glide:4.6.1'
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
     implementation 'com.github.ileafsolutions:ChipRecyclerView:1.0'
     implementation 'com.jakewharton:butterknife:8.8.1'
@@ -59,6 +56,13 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.github.jakebonk:ChipView:1.0.1'
     implementation 'com.github.aliwaris0572:CustomCamera:1.7'
+    implementation 'com.pddstudio:highlightjs-android:1.5.0'
+    implementation 'com.github.florent37:shapeofview:1.3.2'
+    implementation files('libs/itsrts-pptviewer.jar')
+    implementation 'com.github.barteksc:android-pdf-viewer:3.1.0-beta.1'
+    implementation 'org.androidannotations:androidannotations-api:4.4.0'
+    annotationProcessor "org.androidannotations:androidannotations:4.4.0"
+
 
 }
 //added for fire base

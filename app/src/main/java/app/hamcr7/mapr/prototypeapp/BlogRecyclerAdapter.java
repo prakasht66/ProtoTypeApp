@@ -21,6 +21,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Date;
@@ -68,27 +69,34 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         holder.setDescText(desc_data);
 
         String tit_data = blog_list.get(position).getTitle();
-        holder.setDescText(tit_data);
+        holder.setTitText(tit_data);
 
         String cat_data = blog_list.get(position).getCatgory();
-        holder.setDescText(cat_data);
+        holder.setCatText(cat_data);
 
         String image_url = blog_list.get(position).getImage_url();
         String thumbUri = blog_list.get(position).getImage_thumb();
         holder.setBlogImage(image_url, thumbUri);
 
         String user_id = blog_list.get(position).getUser_id();
+
         //User Data will be retrieved here...
-        firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        //firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        firebaseFirestore.collection("Users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                 if(task.isSuccessful()){
 
-                    String userName = task.getResult().getString("name");
-                    String userImage = task.getResult().getString("image");
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        String userName = document.getString("name");
+                        String userImage =document.getString("image");
 
-                    holder.setUserData(userName, userImage);
+                        holder.setUserData(userName, userImage);
+                    }
+
+
+
 
 
                 } else {
@@ -203,13 +211,10 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         private TextView catView;
         private ImageView blogImageView;
         private TextView blogDate;
-
         private TextView blogUserName;
         private CircleImageView blogUserImage;
-
         private ImageView blogLikeBtn;
         private TextView blogLikeCount;
-
         private ImageView blogCommentBtn;
 
 
@@ -242,7 +247,6 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         public void setBlogImage(String downloadUri, String thumbUri){
 
             blogImageView = mView.findViewById(R.id.blog_image);
-
             RequestOptions requestOptions = new RequestOptions();
             requestOptions.placeholder(R.drawable.image_placeholder);
 

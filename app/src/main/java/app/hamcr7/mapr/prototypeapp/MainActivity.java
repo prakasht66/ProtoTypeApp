@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         toolbar = findViewById(R.id.toolbar);
@@ -52,9 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new DiscussionFrag(), "Discussion");
-        adapter.addFragment(new LearnFrag(), "Learn");
-        adapter.addFragment(new NotifyFrag(), "Notifications");
+        adapter.addFragment(new DiscussionFrag(), "NXOpen");
+        adapter.addFragment(new LearnFrag(), "AutoCAD");
         viewPager.setAdapter(adapter);
     }
 

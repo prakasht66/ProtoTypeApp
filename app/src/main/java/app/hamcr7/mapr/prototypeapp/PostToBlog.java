@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -78,6 +79,7 @@ public class PostToBlog extends AppCompatActivity {
     private ArrayList<String> cadCatList = new ArrayList<>();
     private String cadCatString = "";
     private String imagePath="";
+    private FirebaseUser currentUser;
     private static final int CAMERA_REQUEST = 1888;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
@@ -102,7 +104,7 @@ public class PostToBlog extends AppCompatActivity {
         setSupportActionBar(newPostToolbar);
         getSupportActionBar().setTitle("Add New Post");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
         categorytxt=findViewById(R.id.editCat);
         newPostTitle = findViewById(R.id.new_post_tit);
         newPostDesc = findViewById(R.id.new_post_desc);
@@ -214,52 +216,55 @@ public class PostToBlog extends AppCompatActivity {
 
                     // PHOTO UPLOAD
 
-                    UploadTask filePath = storageReference.child("Post_images").child(randomName + ".jpg").putBytes(imageData);
+                    UploadTask uploadTask = storageReference.child("Post_images").child(randomName + ".jpg").putBytes(imageData);
 
 
-                    filePath.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
-
-                            final String downloadUri = task.getResult().getDownloadUrl().toString();
-
-                            if(task.isSuccessful()){
-
-                                File newThumbFile = new File(postImageUri.getPath());
-                                try {
-
-                                    compressedImageFile = new Compressor(PostToBlog.this)
-                                            .setMaxHeight(100)
-                                            .setMaxWidth(100)
-                                            .setQuality(1)
-                                            .compressToBitmap(newThumbFile);
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-
-                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                compressedImageFile.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                                byte[] thumbData = baos.toByteArray();
-
-                                UploadTask uploadTask = storageReference.child("Post_images/thumbs")
-                                        .child(randomName + ".jpg").putBytes(thumbData);
+//                    uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+//                        @Override
+//                        public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
+//
+//                            final String downloadUri = task.getResult().getDownloadUrl().toString();
+//
+//                            if(task.isSuccessful()){
+//
+//                                File newThumbFile = new File(postImageUri.getPath());
+//                                try {
+//
+//                                    compressedImageFile = new Compressor(PostToBlog.this)
+//                                            .setMaxHeight(100)
+//                                            .setMaxWidth(100)
+//                                            .setQuality(1)
+//                                            .compressToBitmap(newThumbFile);
+//
+//                                } catch (IOException e) {
+//                                    e.printStackTrace();
+//                                }
+//
+//                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                                compressedImageFile.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//                                byte[] thumbData = baos.toByteArray();
+//
+//                                UploadTask uploadTask = storageReference.child("Post_images/thumbs")
+//                                        .child(randomName + ".jpg").putBytes(thumbData);
 
                                 uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                                        String downloadthumbUri = taskSnapshot.getDownloadUrl().toString();
-
+                                        String downloadthumbUri = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
+                                        String downloadUri="";
                                         Map<String, Object> postMap = new HashMap<>();
                                         postMap.put("image_url", downloadUri);
                                         postMap.put("image_thumb", downloadthumbUri);
-                                        postMap.put("tit", title);
+                                        postMap.put("title", title);
                                         postMap.put("desc", desc);
-                                        postMap.put("cat", cadCatString);
+                                        postMap.put("catg", cadCatString);
                                         postMap.put("user_id", current_user_id);
                                         postMap.put("timestamp", FieldValue.serverTimestamp());
 
+                                        Map<String, Object> userMaP = new HashMap<>();
+                                        userMaP.put("name",currentUser.getDisplayName());
+                                        userMaP.put("image",currentUser.getPhotoUrl().toString());
                                         firebaseFirestore.collection("Posts").add(postMap).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentReference> task) {
@@ -277,6 +282,14 @@ public class PostToBlog extends AppCompatActivity {
                                                 }
 
                                                 newPostProgress.setVisibility(View.INVISIBLE);
+
+                                            }
+                                        });
+                                        firebaseFirestore.collection("Users").add(userMaP).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentReference> task) {
+
+                                                Toast.makeText(PostToBlog.this, "User was added", Toast.LENGTH_LONG).show();
 
                                             }
                                         });
@@ -302,10 +315,10 @@ public class PostToBlog extends AppCompatActivity {
                     });
 
 
-                }
-
-            }
-        });
+//                }
+//
+//            }
+//        });
 
 
     }

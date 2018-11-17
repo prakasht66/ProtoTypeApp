@@ -2,11 +2,17 @@ package app.hamcr7.mapr.prototypeapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.LinearLayout;
+
+import com.flaviofaria.kenburnsview.RandomTransitionGenerator;
 
 
 /**
@@ -18,10 +24,9 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class LearnFrag extends Fragment {
-
-    Context context;
-
-
+    CardView nxOpenCardView;
+    LinearLayout mainLayout;
+    Context  context;
     public LearnFrag() {
         // Required empty public constructor
     }
@@ -31,18 +36,37 @@ public class LearnFrag extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_learn, container, false);
-        //View view = inflater.inflate(R.layout.fragment_learn, container, false);
-        //context = view.getContext();
-        //Intent myIntent = new Intent(context, TutorialActiviry.class);
-        //startActivity(myIntent);
-        //return view;
-    }
+        View myView=inflater.inflate(R.layout.fragment_learn, container, false);
+        nxOpenCardView=myView.findViewById(R.id.nxOpenCard);
 
+
+
+
+        nxOpenCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                context = view.getContext();
+                Intent myIntent = new Intent(context, NxOpenActivity.class);
+                startActivity(myIntent);
+            }
+        });
+       return  myView;
+    }
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+
+//        mainLayout=view.findViewById(R.id.mainLay);
+//        AnimationDrawable animationDrawable = (AnimationDrawable) mainLayout.getBackground();
+//        animationDrawable.setEnterFadeDuration(2000);
+//        animationDrawable.setExitFadeDuration(4000);
+//        animationDrawable.start();
+    }
 }

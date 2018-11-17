@@ -92,12 +92,20 @@
     <string name="restore_email_fail">Restore email was not sent</string>
     <string name="text_item">Message</string>
 
-    <string-array name="Topics">
-        <item>Introduction</item>
-        <item>Types</item>
-        <item>SampleCode</item>
-        <item>HelpDocs</item>
-        <item>Videos</item>
+    <string-array name="NXTopics">
+        <item>Introduction To NX Open</item>
+        <item>Visual Studio NX Wizard Setup</item>
+        <item>Default Code</item>
+        <item> Create New File </item>
+        <item> Create Block </item>
+        <item> Create Cylinder </item>
+        <item> Create Block And Extrude </item>
+        <item> Create Sketch </item>
+        <item> Create Sketch And Extrude </item>
+        <item> Create Drawing And Base View </item>
+        <item> Create Dimension  </item>
+        <item> Selection Filter Example </item>
+        <item> NX Block Styler Example </item>
     </string-array>
     <string name="title_activity_bottom_navigation">BottomNavigation</string>
     <string name="title_home">Home</string>
