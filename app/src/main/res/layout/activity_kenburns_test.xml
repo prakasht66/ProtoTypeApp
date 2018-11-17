@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".KenburnsTest">
+
+    <com.flaviofaria.kenburnsview.KenBurnsView
+        android:src="@drawable/back_kenbrn"
+        android:id="@+id/kenText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="250dp">
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="150dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="8dp"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/btnFacebook"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#3b5998"
+            android:text="@string/btn_facebook"
+            android:textColor="@color/white" />
+
+
+    </LinearLayout>
+</RelativeLayout>
